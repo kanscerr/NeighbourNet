@@ -32,12 +32,6 @@ const societySchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  private_key: {
-    type: String,
-    default: generate16DigitId,
-    unique: true,
-    required: true
-  },
   email: {
     type: String,
     required: true,
@@ -46,13 +40,34 @@ const societySchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    required: true,
-    maxLength: 30
+    required: false, // Made optional as it will be set in Step 2
+    maxLength: 255
   },
   contact_number: {
     type: String,
     required: true,
     maxLength: 20
+  },
+  admin_secret_key: {
+    type: String,
+    default: generate16DigitId,
+    unique: true
+  },
+  admin_secret_key_expires: {
+    type: Date,
+    default: () => new Date(Date.now() + 7 * 24 * 60 * 60 * 1000) // 7 days from now
+  },
+  verification_files: {
+    type: [String], // Array of file paths
+    default: []
+  },
+  email_verified: {
+    type: Boolean,
+    default: false
+  },
+  is_verified: {
+    type: Boolean,
+    default: false
   },
   created_at: {
     type: Date,
