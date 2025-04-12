@@ -41,7 +41,7 @@ const societySchema = new mongoose.Schema({
   },
   admin_secret_key: {
     type: String,
-    default: generate16DigitId,
+    // default: generate16DigitId,
     required: true,
     unique: true
   },

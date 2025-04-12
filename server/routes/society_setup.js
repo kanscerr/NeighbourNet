@@ -5,9 +5,7 @@ const Society = require('../models/Society');
 const Amenity = require('../models/Amenity');
 const { logInfo, logError } = require('../logger');
 
-/**
- * Middleware to validate admin secret key
- */
+//validate admin secret key
 const validateSecretKey = async (req, res, next) => {
   try {
     const { society_id } = req.params;
@@ -63,14 +61,9 @@ const validateSecretKey = async (req, res, next) => {
   }
 };
 
-/**
- * Load society setup page
- */
+//society setup page
 router.get('/:society_id', validateSecretKey, (req, res) => {
   try {
-    // This endpoint would normally render a setup page
-    // Since we're just building API endpoints, we'll return JSON instead
-    
     res.status(200).json({
       success: true,
       message: 'Society setup page',
@@ -95,9 +88,7 @@ router.get('/:society_id', validateSecretKey, (req, res) => {
   }
 });
 
-/**
- * Set up society admin password
- */
+//set up new password
 router.post('/:society_id/set-password', validateSecretKey, async (req, res) => {
   try {
     const { password, confirm_password } = req.body;
@@ -186,8 +177,7 @@ router.post('/:society_id/configure', validateSecretKey, async (req, res) => {
     res.status(200).json({
       success: true,
       message: 'Society configured successfully',
-      society_id: req.society.society_id,
-      private_key: req.society.private_key
+      society_id: req.society.society_id
     });
   } catch (error) {
     logError('Error configuring society', {

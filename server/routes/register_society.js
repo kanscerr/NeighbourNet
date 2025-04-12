@@ -60,7 +60,7 @@ const upload = multer({
 });
 
 //register new society
-router.post('/register', upload.array('verification_documents', 5), async (req, res) => {
+router.post('/register', upload.fields([{ name: 'verification_files[]', maxCount: 10 }]), async (req, res) => {
   try {
     const {
       society_name,
@@ -79,12 +79,17 @@ router.post('/register', upload.array('verification_documents', 5), async (req, 
     }
 
     // Validate if files were uploaded
-    // if (!req.files || req.files.length === 0) {
-    //   return res.status(400).json({
-    //     success: false,
-    //     message: 'Verification documents are required'
-    //   });
-    // }
+    const files = req.files['verification_files[]'] || []; // Default to an empty array if not found
+
+    if (!Array.isArray(files)) {
+      return res.status(400).json({
+        success: false,
+        message: 'No files uploaded or invalid file structure'
+      });
+    }
+
+    // Now you can safely use map
+    const verificationFiles = files.map(file => file.path.replace(/\\/g, '/'));
 
     // Check if society with same email already exists
     const existingSociety = await Society.findOne({ email });
@@ -102,11 +107,13 @@ router.post('/register', upload.array('verification_documents', 5), async (req, 
       address,
       email,
       contact_number,
-    //   verification_files: req.files.map(file => file.path.replace(/\\/g, '/')),
+      admin_secret_key: generate16DigitId(),
+      verification_files: verificationFiles,
       is_verified: false
     });
 
     // Save the society to database
+    console.log(newSociety.admin_secret_key);
     await newSociety.save();
 
     // Log the society registration
