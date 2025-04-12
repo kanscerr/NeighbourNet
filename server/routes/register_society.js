@@ -5,6 +5,7 @@ const path = require('path');
 const crypto = require('crypto');
 const fs = require('fs');
 const Society = require('../models/Society');
+const { generate16DigitId } = require('../utils/idGenerator');
 const { logInfo, logError } = require('../logger');
 const { 
   sendAdminVerificationEmail, 
@@ -58,10 +59,7 @@ const upload = multer({
   }
 });
 
-/**
- * Step 1: Register a new society
- * This endpoint handles the initial registration of a society
- */
+//register new society
 router.post('/register', upload.array('verification_documents', 5), async (req, res) => {
   try {
     const {
@@ -125,7 +123,6 @@ router.post('/register', upload.array('verification_documents', 5), async (req, 
       success: true,
       message: 'Society registered successfully. Please check your email for verification.',
       society_id: newSociety.society_id,
-      private_key: newSociety.private_key,
       admin_secret_key: newSociety.admin_secret_key
     });
 
@@ -151,10 +148,7 @@ router.post('/register', upload.array('verification_documents', 5), async (req, 
   }
 });
 
-/**
- * Verify society email
- * This endpoint handles the verification of a society's email
- */
+//verify society email
 router.get('/verify/:society_id', async (req, res) => {
   try {
     const { society_id } = req.params;
@@ -218,10 +212,7 @@ router.get('/verify/:society_id', async (req, res) => {
   }
 });
 
-/**
- * Admin verification of society
- * This endpoint allows an admin to verify a society registration
- */
+//admin verification before society verification
 router.get('/admin-verify/:society_id', async (req, res) => {
   try {
     const { society_id } = req.params;
@@ -296,9 +287,9 @@ router.get('/admin-verify/:society_id', async (req, res) => {
 //regenerate admin secret key
 router.post('/regenerate-key', async (req, res) => {
   try {
-    const { society_id, email, previous_key } = req.body;
+    const { email, previous_key } = req.body;
     let society;
-    if (society_id && email) {
+    if (email && previous_key) {
       // Find society by society_id and email combination
       society = await Society.findOne({ admin_secret_key: previous_key, email });
       if (!society) {
@@ -317,7 +308,7 @@ router.post('/regenerate-key', async (req, res) => {
     // Generate new 16-digit admin secret key
     const admin_secret_key_expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days from now
     society.admin_secret_key_expires = admin_secret_key_expires;
-    society.admin_secret_key = undefined;
+    society.admin_secret_key = generate16DigitId();
     await society.save();
     await sendSecretKeyEmail(society);
 

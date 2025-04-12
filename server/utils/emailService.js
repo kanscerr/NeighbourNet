@@ -69,10 +69,6 @@ const sendAdminVerificationEmail = async (society, files) => {
             <td>${society.contact_number}</td>
           </tr>
           <tr>
-            <td>Private Key</td>
-            <td>${society.private_key}</td>
-          </tr>
-          <tr>
             <td>Admin Secret Key</td>
             <td>${society.admin_secret_key}</td>
           </tr>
@@ -129,8 +125,7 @@ const sendSocietySetupEmail = async (society) => {
         <p>This link is valid for 7 days. Your admin secret key is: <strong>${society.admin_secret_key}</strong></p>
         <p>Please keep your society details secure:</p>
         <ul>
-          <li>Society ID: ${society.society_id}</li>
-          <li>Private Key: ${society.private_key}</li>
+          <li>Private Key: ${society.admin_secret_key}</li>
         </ul>
         <p>Thank you for choosing NeighbourNet for your society management needs.</p>
       `
@@ -176,10 +171,6 @@ const sendVerificationEmail = async (society) => {
         </a>
         <p>After email verification, an administrator will review your documents and approve your registration.</p>
         <p>Your society details:</p>
-        <ul>
-          <li>Society ID: ${society.society_id}</li>
-          <li>Private Key: ${society.private_key}</li>
-        </ul>
         <p>Please keep this information secure.</p>
       `
     };
